@@ -1,7 +1,5 @@
 import { inject, injectable } from 'tsyringe';
-
 import { verify, sign } from 'jsonwebtoken';
-
 import { IUsersTokensRepository } from '@modules/accounts/repositories/IUsersTokensRepository';
 import auth from '@config/auth';
 import { AppError } from '@shared/errors/AppError';
@@ -20,24 +18,26 @@ interface ITokenResponse {
 @injectable()
 class RefreshTokenUseCase {
   constructor(
+
     @inject("UsersTokensRepository")
     private usersTokensRepository: IUsersTokensRepository,
+
     @inject("DayjsDateProvider")
     private dateProvider: IDateProvider,
   ) {}
 
   async execute(token: string): Promise<ITokenResponse> {
     const { email, sub } = verify(token, auth.secret_refresh_token) as IPayload;
+
     const user_id = sub;
 
-    const userToken =
-      await this.usersTokensRepository.findByUserIdAndRefreshToken(
-        user_id,
+    const userToken = await this.usersTokensRepository.findByUserIdAndRefreshToken(
+        user_id, 
         token,
       );
 
     if (!userToken) {
-      throw new AppError("Refresh Token doesn't Exists");
+      throw new AppError("Refresh Token doesn't exists");
     }
 
     await this.usersTokensRepository.deleteById(userToken.id);
@@ -45,7 +45,7 @@ class RefreshTokenUseCase {
     const expires_date = this.dateProvider.addDays(
       auth.expires_in_refresh_days,
     );
-
+    
     const refresh_token = sign({ email }, auth.secret_refresh_token, {
       subject: sub,
       expiresIn: auth.expires_in_refresh_token,

@@ -7,9 +7,8 @@ import { UsersTokensRepository } from "@modules/accounts/infra/typeorm/repositor
 
 interface IPayload {
   sub: string;
+
 }
-
-
 
 export async function ensureAuthenticated(
   request: Request,
@@ -17,6 +16,7 @@ export async function ensureAuthenticated(
   next: NextFunction
 ) {
   const authHeader = request.headers.authorization;
+  console.log('authHeader \n', authHeader);
 
   const usersTokensRepository = new UsersTokensRepository();
 
@@ -25,24 +25,28 @@ export async function ensureAuthenticated(
   }
 
   const [, token] = authHeader.split(" ");
+  console.log("split",[, token])
 
   try {
     const { sub: user_id } = verify(
         token, 
         auth.secret_refresh_token
         ) as IPayload;
+        console.log("Verificação",{ sub: user_id })
 
-    //const usersRepository = new UsersRepository();
+     //const usersRepository = new UsersRepository();
 
-    const user = await usersTokensRepository.findByUserIdAndRefreshToken(user_id, token);
+     const user = await usersTokensRepository.findByUserIdAndRefreshToken(user_id, token);
+     console.log("user_id e token", user)
 
-    if(!user) { 
+     if(!user) { 
         throw new AppError("User does not found", 401);
     }
 
-    request.user = {
+    const dados = request.user = {
       id: user_id,
     };
+    console.log("Request", dados)
 
     next();
   } catch (error) {

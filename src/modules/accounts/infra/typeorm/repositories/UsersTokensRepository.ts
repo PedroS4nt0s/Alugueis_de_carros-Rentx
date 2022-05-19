@@ -1,4 +1,7 @@
-import { getRepository, Repository } from "typeorm";
+import { 
+    getRepository,
+    Repository 
+} from "typeorm";
 
 import { ICreateUserTokenDTO } from "@modules/accounts/dtos/ICreateUserTokenDTO";
 import { IUsersTokensRepository } from "@modules/accounts/repositories/IUsersTokensRepository";
@@ -12,32 +15,45 @@ class UsersTokensRepository implements IUsersTokensRepository {
     constructor() {
         this.repository = getRepository(UserTokens)
     }
+ 
+
     async create({ //gerando usertoken 
-        user_id,
-        refresh_token, 
-        expires_date, 
+        expires_date,
+        refresh_token,
+        user_id, 
     }: ICreateUserTokenDTO): Promise<UserTokens> {
         const userToken = this.repository.create({
-            user_id,
-            refresh_token,
             expires_date,
+            refresh_token,
+            user_id,
         });
+
     await this.repository.save(userToken);
 
     return userToken;
     }
 
-    findByUserIdAndRefreshToken(user_id: string, refresh_token: string): Promise<UserTokens> {
-        throw new Error("Method not implemented.");
+    async findByUserIdAndRefreshToken(
+        user_id: string, 
+        refresh_token: string
+    ): Promise<UserTokens> {
+        const usersTokens = await this.repository.findOne({
+            user_id,
+            refresh_token,
+        });
+        return usersTokens;
     }
-    deleteById(id: string): Promise<void> {
-        throw new Error("Method not implemented.");
-    }
+
     findByRefreshToken(refresh_token: string): Promise<UserTokens> {
-        throw new Error("Method not implemented.");
+        const usersRefreshToken = this.repository.findOne({
+            refresh_token,
+        });
+        return usersRefreshToken;
     }
 
-
+    async deleteById(id: string): Promise<void> {
+        await this.repository.delete(id);
+    }
 }
 
 export { UsersTokensRepository }

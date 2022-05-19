@@ -17,13 +17,13 @@ describe('Create Category Controller', () => {
     const password = await hash('admin', 8);
     const id = uuidV4();
     await connection.query(`
-    INSERT INTO USERS(id, name, email, password, "isAdmin", created_at, driver_license)
+    INSERT INTO users(id, name, email, password, "isAdmin", created_at, driver_license)
     values('${id}', 'admin', 'admin@admin.com', '${password}', true, 'now()', '564654' )
     `);
   });
 
   afterAll(async () => {
-    await connection.dropDatabase();
+    await connection.dropDatabase();    
     await connection.close();
   });
 
@@ -37,8 +37,8 @@ describe('Create Category Controller', () => {
     const response = await request(app)
       .post('/categories')
       .send({
-        name: '22',
-        description: 'Categoria de carro suv',
+        name: 'Category Supertest',
+        description: 'Category Supertest',
       })
       .set({ Authorization: `Bearer ${refresh_token}` });
 
@@ -51,15 +51,20 @@ describe('Create Category Controller', () => {
       .send({ email: 'admin@admin.com', password: 'admin' });
 
     const { refresh_token } = responseToken.body;
+    console.log("response token",responseToken.body)
+
+    console.log("variavel",refresh_token)
 
     const response = await request(app)
       .post('/categories')
       .send({
-        name: '22',
-        description: 'Categoria de carro suv',
+        name: 'Category Supertest',
+        description: 'Category Supertest',
       })
-      .set({ Authorization: `Bearer ${refresh_token}` });
+      .set({ Authorization: `Bearer ${refresh_token}`
+     });
 
+     console.log("response",response.status)
     expect(response.status).toBe(400);
   });
 });

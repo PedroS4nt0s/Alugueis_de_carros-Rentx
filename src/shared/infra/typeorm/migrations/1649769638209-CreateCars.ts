@@ -65,17 +65,6 @@ export class CreateCars1649769638209 implements MigrationInterface {
                 ],
             })
         );
-      /*  await queryRunner.createForeignKey(
-            "specifications_cars",
-            new TableForeignKey({
-                name: "FK_CATEGORYCAR",
-                referencedTableName: "categories",
-                referencedColumnNames: ["id"],
-                columnNames: ["category_id"],   
-                onDelete: "SET NULL",
-                onUpdate: "SET NULL",
-            })
-        );*/
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
